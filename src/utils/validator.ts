@@ -1,7 +1,8 @@
 import * as yup from 'yup';
+import { CardType, CardStatus } from '../modules/card/profile/card-profile.model';
 
 export const userRegistrationSchema = yup.object().shape({
-  id: yup.string().uuid().optional(),
+  username: yup.string().required('Username is required'),
   name: yup.string().required('Name is required'),
   email: yup.string().email('Invalid email format').required('Email is required'),
   password: yup.string().trim()
@@ -21,14 +22,21 @@ export const userRegistrationSchema = yup.object().shape({
 
 export const userUpdateSchema = yup.object().shape({
   name: yup.string().optional(),
-  // email: yup.string().email('Invalid email format').optional(),
+  email: yup.string().email('Invalid email format').optional(),
   password: yup.string().trim()
   .min(6, 'Password must be at least 6 characters')
   .optional(),
   confirm_password: yup.string()
   .min(6, 'Password must be at least 6 characters')
-  .oneOf([yup.ref('password')], 'Passwords must match')
+  .oneOf([yup.ref('password')], 'Passwords must match'),
+  phone: yup.string().optional(),
+  role: yup.string().optional(),
+});
 
+export const cardValidationSchema = yup.object().shape({
+  user_id: yup.string().uuid().required(),
+  card_holder_name: yup.string().required(),
+  card_type: yup.mixed().oneOf(Object.values(CardType)).required(),
 });
 
 export const loginSchema = yup.object().shape({
@@ -41,3 +49,14 @@ export const userVerificationSchema = yup.object().shape({
   code: yup.string().required('Verification code is required'),
 });
 
+export const idSchema = yup.string().uuid('Id must be a valid uuid').required('Id is required');
+
+export const cardProfileUpdateSchema = yup.object().shape({
+  status: yup.mixed().oneOf(Object.values(CardStatus)),
+  balance: yup.number().positive(),
+});
+
+export const paginationSchema = yup.object().shape({
+  page: yup.number().positive().required(),
+  limit: yup.number().positive().required(),
+});
