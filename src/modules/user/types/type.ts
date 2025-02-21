@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { UserRole } from '../../../utils/roles';
+import { CardType } from '../../card/profile/card-profile.model';
 
 export interface UserAttributes {
     name?: string;
@@ -8,6 +9,10 @@ export interface UserAttributes {
     confirm_password?: string;
 }
 
+export interface CardNumberGenerationOptions {
+  cardType: CardType;
+  issuerCode?: string;
+}
 export interface UserData extends Omit<UserAttributes, 'id'> {
   confirm_password?: string;
 }
@@ -16,6 +21,7 @@ export interface TypedRequest extends Request {
   body: {
     name: string;
     email: string;
+    username: string;
     password: string;
     confirm_password: string;
   };
@@ -24,6 +30,7 @@ export interface TypedRequest extends Request {
 export interface UserData {
   name?: string;
   email?: string;
+  username: string;
   password?: string;
   confirm_password?: string;
 }
@@ -110,4 +117,13 @@ declare global {
       user?: JwtPayload;
     }
   }
+}
+
+export interface CardProfile {
+  cardNumber: string;
+  creationDate: Date;
+  expiryDate: Date;
+  cardType: CardType;
+  cvv2: string;
+  // Other properties
 }
