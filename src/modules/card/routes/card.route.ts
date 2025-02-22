@@ -12,15 +12,23 @@ cardRouter.post('/profile',
   authentication, 
   authorizeRole(['admin', 'user']), 
   async (req: Request, res: Response, next: NextFunction) => {
-    cardProfileController.createProfile
+    cardProfileController.createProfile(req, res);
   }
 );
 
 cardRouter.get('/getall', 
   authentication, 
-  authorizeRole(['admin']), 
+  authorizeRole(['admin', 'user']), 
   async (req: Request, res: Response, next: NextFunction) => {
-    cardProfileController.getProfiles
+    cardProfileController.getProfiles(req, res);
+  }
+);
+
+cardRouter.get('/getone/:id', 
+  authentication, 
+  authorizeRole(['admin', 'user']), 
+  async (req: Request, res: Response, next: NextFunction) => {
+    cardProfileController.getProfile(req, res);
   }
 );
 
@@ -28,15 +36,23 @@ cardRouter.put('/update/:id',
   authentication, 
   authorizeRole(['admin', 'user']), 
   async (req: Request, res: Response, next: NextFunction) => {
-    cardProfileController.updateProfile
+    cardProfileController.updateProfile(req, res);
   }
 );
 
 cardRouter.post('/request', 
   authentication, 
-  authorizeRole(['admin', 'user']), 
+  authorizeRole(['user']), 
   async (req: Request, res: Response, next: NextFunction) => {
-    cardRequestController.createRequest
+    cardRequestController.createRequest(req, res);
+  }
+);
+
+cardRouter.delete('/delete/:id',
+  authentication,
+  authorizeRole(['admin', 'user']),
+  async (req: Request, res: Response, next: NextFunction) => {
+    cardProfileController.deleteCardProfile(req, res);
   }
 );
 
