@@ -1,10 +1,12 @@
 import { Request, Response } from "express";
 import * as yup from 'yup';
+
 import { 
   createCardProfile, 
   getCardProfileById, 
   updateCardProfile,
-  getCardProfiles
+  getCardProfiles,
+  deleteCardProfile
 } from '../../services/card-profile.service';
 import { CardStatus } from '../card-profile.model';
 import { cardValidationSchema, idSchema, paginationSchema, cardProfileUpdateSchema } from '../../../../utils/validator';
@@ -12,11 +14,25 @@ import { cardValidationSchema, idSchema, paginationSchema, cardProfileUpdateSche
 const cardProfileController = {
   createProfile: async (req: Request, res: Response): Promise<Response> => {
     try {
-      const validatedData = await cardValidationSchema.validate(req.body, { abortEarly: false });
+      const user_id = req.user?.id ?? '';
+      
+      if (!user_id) {
+        return res.status(401).json({
+          status: 'error',
+          message: 'Unauthorized: User ID not found'
+        });
+      }
 
-      const cardProfile = await createCardProfile(validatedData);
+      const profileBody = { ...req.body, user_id };
+      
+      const validatedData = await cardValidationSchema.validate(profileBody, { abortEarly: false });
+      const cardProfile = await createCardProfile({ 
+        ...validatedData, 
+        user_id, 
+        status: CardStatus.PENDING 
+      });
 
-      return res.status(cardProfile.statusCode).json(cardProfile);
+      return res.status(cardProfile.statusCode || 201).json(cardProfile);
     } catch (error) {
       if (error instanceof yup.ValidationError) {
         return res.status(400).json({
@@ -29,7 +45,8 @@ const cardProfileController = {
         });
       }
 
-      console.error(error);
+      console.error('Card Profile Creation Error:', error);
+
       return res.status(500).json({
         status: 'error',
         message: 'Internal server error',
@@ -40,8 +57,8 @@ const cardProfileController = {
 
   getProfile: async (req: Request, res: Response): Promise<Response> => {
     try {
-      const id = idSchema.validate(req.params, { abortEarly: false });
-      const cardProfile = await getCardProfileById(id as unknown as string);
+      const { id } = await idSchema.validate(req.params, { abortEarly: false });
+      const cardProfile = await getCardProfileById(id);
 
       return res.status(cardProfile.statusCode).json(cardProfile);
     } catch (error) {
@@ -56,8 +73,8 @@ const cardProfileController = {
 
   getProfiles: async (req: Request, res: Response): Promise<Response> => {
     try {
-      const { limit, page } = await paginationSchema.validate(req.query, { abortEarly: false });
-      const cardProfiles = await getCardProfiles(limit, page);
+      const { limit = 10, page = 1 } = await paginationSchema.validate(req.query, { abortEarly: false });
+      const cardProfiles = await getCardProfiles(Number(limit), Number(page));
 
       return res.status(cardProfiles.statusCode).json(cardProfiles);
     } catch (error) {
@@ -72,15 +89,21 @@ const cardProfileController = {
 
   updateProfile: async (req: Request, res: Response): Promise<Response> => {
     try {
-      const id = await idSchema.validate(req.params, { abortEarly: false});
+      const  { id } = await idSchema.validate(req.params, { abortEarly: false });
 
       const validatedData = await cardProfileUpdateSchema.validate(req.body, { abortEarly: false });
-
-      const cardProfile = await updateCardProfile(id, validatedData);
+      const userId = req.user?.id;
+      const data = {
+        user_id: userId,
+        status: validatedData.status,
+        // card_holder_name: validatedData.card_holder_name
+      };
+      const cardProfile = await updateCardProfile(id, data);
 
       return res.status(cardProfile.statusCode).json(cardProfile);
     } catch (error) {
       if (error instanceof yup.ValidationError) {
+        console.log( error );
         return res.status(400).json({
           status: 'error',
           message: 'Validation failed',
@@ -91,6 +114,22 @@ const cardProfileController = {
         });
       }
 
+      console.error('Update Profile Error:', error);
+      return res.status(500).json({
+        status: 'error',
+        message: 'Internal server error',
+        error: error instanceof Error ? error.message : 'Unknown error'
+      });
+    }
+  },
+
+  deleteCardProfile: async (req: Request, res: Response): Promise<Response> => {
+    try {
+      const { id } = await idSchema.validate(req.params, { abortEarly: false });
+      const cardProfile = await deleteCardProfile(id);
+
+      return res.status(cardProfile.statusCode).json(cardProfile);
+    } catch (error) {
       console.error(error);
       return res.status(500).json({
         status: 'error',
@@ -99,6 +138,6 @@ const cardProfileController = {
       });
     }
   }
-};
+}
 
 export default cardProfileController;

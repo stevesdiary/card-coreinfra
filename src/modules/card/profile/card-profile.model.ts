@@ -7,8 +7,9 @@ import {
   BelongsTo,
   BeforeCreate,
   BeforeUpdate,
-  Validate 
+  Validate
 } from 'sequelize-typescript';
+import { Op } from 'sequelize';
 import { User } from '../../user/models/user.model';
 import { CardPinEncryptionService } from '../services/card-encryption.service';
 
@@ -18,6 +19,17 @@ export enum CardType {
   PREPAID = 'PREPAID'
 }
 
+export enum Currency {
+  NGN = 'NGN',
+  USD = 'USD',
+  EUR = 'EUR',
+  GBP = 'GBP'
+}
+
+export enum Branch_Blacklist {
+  HEAD_OFFICE = 'Head Office',
+  BRANCH_OFFICE = 'Branch Office'
+}
 export enum CardStatus {
   ACTIVE = 'ACTIVE',
   INACTIVE = 'INACTIVE',
@@ -27,7 +39,13 @@ export enum CardStatus {
 
 @Table({
   tableName: 'card_profiles',
-  timestamps: true
+  timestamps: true,
+  indexes: [
+    {
+      unique: true,
+      fields: ['user_id', 'card_type', 'status', 'expiry_date']
+    }
+  ]
 })
 export class CardProfile extends Model {
   @Column({
@@ -98,8 +116,6 @@ export class CardProfile extends Model {
   })
   pin?: string;
   
-  
-
   @Column({
     type: DataType.DECIMAL(10, 2),
     defaultValue: 0.00
@@ -170,7 +186,8 @@ export class CardModel extends Model {
   status?: CardStatus;
 
   @Column({
-    type: DataType.DATE
+    type: DataType.DATE,
+    allowNull: false
   })
   expiry_date?: Date;
 
@@ -180,12 +197,44 @@ export class CardModel extends Model {
   cvv?: string;
 
   @Column({
+    type: DataType.ENUM(...Object.values(Currency)),
+    allowNull: false,
+    defaultValue: Currency.NGN
+  })
+  currency?: Currency;
+
+  @Column({
     type: DataType.DECIMAL(10, 2),
     defaultValue: 0.00
   })
   balance?: number;
 
+  @Column({
+    type: DataType.ENUM(...Object.values(Branch_Blacklist)),
+    defaultValue: Branch_Blacklist.HEAD_OFFICE
+  })
+  branch_lacklist?: string;
+
   @BelongsTo(() => CardProfile)
   card_profile?: CardProfile;
+
+  @BeforeCreate
+  @BeforeUpdate
+  static async validateUniqueActiveCard(instance: CardProfile) {
+    const existingCard = await CardProfile.findOne({
+      where: {
+        user_id: instance.user_id,
+        card_type: instance.card_type,
+        status: CardStatus.ACTIVE,
+        expiry_date: {
+          [Op.gt]: new Date()
+        }
+      }
+    });
+
+    if (existingCard) {
+      throw new Error('You already have an active card of this type');
+    }
+  }
 }
 
