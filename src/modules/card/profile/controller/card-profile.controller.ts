@@ -27,9 +27,9 @@ const cardProfileController = {
       
       const validatedData = await cardValidationSchema.validate(profileBody, { abortEarly: false });
       const cardProfile = await createCardProfile({ 
-        ...validatedData, 
-        user_id, 
-        status: CardStatus.PENDING 
+        card_type: validatedData.card_type,
+        card_holder_name: validatedData.card_holder_name,
+        user_id
       });
 
       return res.status(cardProfile.statusCode || 201).json(cardProfile);

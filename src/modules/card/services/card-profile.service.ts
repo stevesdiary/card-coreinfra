@@ -1,7 +1,7 @@
 import { customAlphabet } from 'nanoid';
 
 import { CardProfile, CardStatus } from '../profile/card-profile.model';
-import { validatedCardData } from '../../user/types/type';
+// import { validatedCardData } from '../../user/types/type';
 import { Op } from 'sequelize';
 
 export const createCardProfile = async (validatedCardData: any) => {
@@ -16,7 +16,9 @@ export const createCardProfile = async (validatedCardData: any) => {
       ...validatedCardData,
       card_number: cardNumber,
       expiry_date: expiryDate,
-      cvv: cvv2
+      cvv: cvv2,
+      pin: '0000',
+      status: CardStatus.PENDING
     };
 
     if (!validatedCardData.user_id || !validatedCardData.card_type) {
