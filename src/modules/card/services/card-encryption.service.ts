@@ -1,13 +1,16 @@
-import { randomBytes, createCipheriv, createDecipheriv } from 'crypto';
-
+import { randomBytes, createCipheriv, createDecipheriv, scryptSync } from 'crypto';
 
 export class CardPinEncryptionService {
   private static getEncryptionKey(): Buffer {
-    const key = process.env.ENCRYPTION_KEY;
-    if (!key) {
+    const rawKey = process.env.ENCRYPTION_KEY;
+    if (!rawKey) {
       throw new Error('Encryption key not configured');
     }
-    return Buffer.from(key, 'hex');
+    
+    const salt = process.env.ENCRYPTION_SALT || '';
+    const key = scryptSync(rawKey, salt, 32);
+    
+    return key;
   }
 
   static encrypt(pin: string): string {
@@ -22,7 +25,6 @@ export class CardPinEncryptionService {
   }
 
   static decrypt(encryptedPin: string): string {
-
     const key = this.getEncryptionKey();
     const [ivHex, encryptedData] = encryptedPin.split(':');
     
