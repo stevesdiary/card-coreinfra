@@ -57,6 +57,13 @@ module.exports = {
         type: Sequelize.DECIMAL(10, 2),
         defaultValue: 0.00
       },
+      currency: {
+        type: Sequelize.ENUM('NGN', 'USD', 'EUR', 'GBP'),
+        defaultValue: 'NGN'
+      },
+      branch_blacklist: {
+        type: Sequelize.STRING
+      },
       createdAt: {
         type: Sequelize.DATE,
         defaultValue: Date.now()
