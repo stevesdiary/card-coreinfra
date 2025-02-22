@@ -1,4 +1,5 @@
-import { Table, Column, Model, DataType, IsUUID, PrimaryKey, Unique, Default } from 'sequelize-typescript';
+import { Table, Column, Model, DataType, IsUUID, PrimaryKey, Unique, Default, HasOne } from 'sequelize-typescript';
+import { CardProfile } from '../../card/profile/card-profile.model';
 
 @Table({
   tableName: 'users',
@@ -29,7 +30,7 @@ export class User extends Model {
     type: DataType.STRING,
     allowNull: false
   })
-  username?: string
+  username!: string
 
   @Column({
     type: DataType.STRING,
@@ -44,6 +45,9 @@ export class User extends Model {
   @Default(false)
   @Column(DataType.BOOLEAN)
   verified!: boolean;
+
+  @HasOne(() => CardProfile)
+  card_profile!: CardProfile;
 }
 
 export interface IUserRegistration {

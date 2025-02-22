@@ -6,7 +6,6 @@ import { CreationAttributes } from "sequelize";
 import { User } from "../models/user.model";
 import { UserResponseData } from "../types/type";
 import sendEmail from "./email.service";
-import { Response } from "express";
 
 const salt = process.env.BCRYPT_SALT || 10;
 
@@ -24,9 +23,11 @@ export const registerUser = async (userData: CreationAttributes<User>) => {
         message: `User already exists, login with your email and password`,
       };
     }
+    // console.log('userData', userData.username);
     const hashed = await bcrypt.hash(userData.password, salt);
     let userCreationData = {
       name: userData.name,
+      username: userData.username,
       email: userData.email,
       password: hashed,
     };
@@ -36,7 +37,7 @@ export const registerUser = async (userData: CreationAttributes<User>) => {
     if (user) {
       const nanoid = customAlphabet("1234567890", 6)();
       const verificationCode = nanoid;
-      await saveToRedis(`"verify" + ${user.email}`, verificationCode, 600);
+      await saveToRedis(`verify:${user.email}`, verificationCode, 600);
 
       const emailPayload = {
         to: user.email,
@@ -59,7 +60,7 @@ export const registerUser = async (userData: CreationAttributes<User>) => {
 
 export const verifyUser = async ( { email, code }: { email: string, code: string} ) => {
   try {
-    const verificationCode = await getFromRedis(`"verify" + ${email}`);
+    const verificationCode = await getFromRedis(`verify:${email}`);
     if (verificationCode === code) {
       await User.update(
         { verified: true },
@@ -79,6 +80,32 @@ export const verifyUser = async ( { email, code }: { email: string, code: string
       data: null
     };
   } catch (error) {
+    throw error;
+  }
+}
+
+export const resendCode = async (emailPayload: string ) => {
+  try {
+    const email = emailPayload;
+    const nanoid = customAlphabet("1234567890", 6)();
+    const verificationCode = nanoid;
+    await saveToRedis(`verify:${email}`, verificationCode, 600);
+
+    const emailData = {
+      to: email,
+      subject: "Email Verification",
+      text: `Your verification code is ${verificationCode}`,
+    };
+    await sendEmail(emailData);
+    return {
+      statusCode: 200,
+      status: "success",
+      message: "Verification code sent to your email",
+      data: [],
+    };
+
+  } catch (error) {
+    console.log('Error ocurred', error)
     throw error;
   }
 }
