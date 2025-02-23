@@ -6,10 +6,12 @@ import {
   ForeignKey, 
   BelongsTo,
   BeforeCreate,
-  BeforeUpdate
+  BeforeUpdate,
+  HasMany
 } from 'sequelize-typescript';
 import { User } from '../../user/models/user.model';
 import { CardPinEncryptionService } from '../services/card-encryption.service';
+import { CardFee } from '../Fee/models/card.fee.model';
 
 export enum CardType {
   VIRTUAL = 'VIRTUAL',
@@ -144,4 +146,12 @@ export class CardProfile extends Model {
   }
   @BelongsTo(() => User)
   user?: User;
+
+  @HasMany(() => CardFee)
+  fees: CardFee[] = [];
+
+  constructor() {
+    super();
+    this.fees = [];
+  }
 }
