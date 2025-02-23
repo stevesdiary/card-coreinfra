@@ -8,6 +8,7 @@ import cardRequestRouter from "./modules/card/routes/card-request.route";
 import feeRouter from "./modules/card/Fee/routes/fee.route"
 const router = Router();
 
+
 router.use("/register", registrationRouter);
 router.use("/user", userRouter);
 router.use("/log", loginRouter);
