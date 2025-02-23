@@ -72,20 +72,59 @@ const feeController = {
     }
   },
 
-  getAllFee: async (req: Request, res: Response) => {
+  getAllFees: async (req: Request, res: Response) => {
     try {
       const getFees = await getCardFees();
-      return 
+      return res.status(getFees.statusCode).json({
+        getFees
+      });
     } catch (error) {
-      
+      if (error instanceof yup.ValidationError) {
+        return res.status(400).json({
+          status: 'error',
+          message: 'Validation failed',
+          errors: error.inner.map(err => ({
+            field: err.path,
+            message: err.message
+          }))
+        });
+      }
+
+      console.error('Fee update Error:', error);
+
+      return res.status(500).json({
+        status: 'error',
+        message: 'Internal server error',
+        error: error instanceof Error ? error.message : 'Unknown error'
+      });
     }
   },
 
   deleteFee: async (req: Request, res: Response) => {
     try {
+      const { id } = await idSchema.validate(req.params, {abortEarly: false});
+      const destroyRecord = await deleteCardFee(id);
+      return res.status(destroyRecord.statusCode).json(destroyRecord);
       
     } catch (error) {
-      
+      if (error instanceof yup.ValidationError) {
+        return res.status(400).json({
+          status: 'error',
+          message: 'Validation failed',
+          errors: error.inner.map(err => ({
+            field: err.path,
+            message: err.message
+          }))
+        });
+      }
+
+      console.error('Fee delete Error:', error);
+
+      return res.status(500).json({
+        status: 'error',
+        message: 'Internal server error',
+        error: error instanceof Error ? error.message : 'Unknown error'
+      });
     }
   }
 
