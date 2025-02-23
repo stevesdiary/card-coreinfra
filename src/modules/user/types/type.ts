@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
-import { UserRole } from '../../../utils/roles';
-import { CardType } from '../../card/profile/card-profile.model';
+import { UserRole } from '../../user/models/user.model';
+import { CardStatus, CardType } from '../../card/profile/card-profile.model';
+import { request } from 'http';
 
 export interface UserAttributes {
     name?: string;
@@ -57,6 +58,14 @@ export interface UserResponseData {
   status: string, // 'success' | 'fail' | 'error';
   message: string;
   data: any | null;
+}
+
+export interface updateUserData {
+  // name?: string;
+  // email?: string;
+  // username?: string;
+  // password?: string;
+  role: UserRole;
 }
 
 export interface EmailPayload {
@@ -120,10 +129,41 @@ declare global {
 }
 
 export interface CardProfile {
-  cardNumber: string;
+  // cardNumber: string;
   creationDate: Date;
   expiryDate: Date;
   cardType: CardType;
   cvv2: string;
-  // Other properties
+  // validFor: string; 
+}
+
+export interface validatedCardData {
+//   user_id: string;
+  card_type: CardType;
+  card_holder_name?: string;
+//   cardNumber: string;
+//   expiryDate: Date;
+//   cvv2: string;
+//   status?: CardStatus;
+}
+
+export interface ValidationError {
+  field: string;
+  message: string;
+}
+
+export interface ErrorResponse {
+  status: 'error';
+  message: string;
+  errors: ValidationError[];
+}
+
+export interface CardRequestData {
+  user_id: string;
+  card_holder_name: string;
+  requested_card_type: CardType;
+  initiator: string;
+  card_profile_id: string;
+  status: CardStatus;
+  remarks: string;
 }
