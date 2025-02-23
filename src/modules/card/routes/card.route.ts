@@ -40,14 +40,6 @@ cardRouter.put('/update/:id',
   }
 );
 
-cardRouter.post('/request', 
-  authentication, 
-  authorizeRole(['user']), 
-  async (req: Request, res: Response, next: NextFunction) => {
-    cardRequestController.createRequest(req, res);
-  }
-);
-
 cardRouter.delete('/delete/:id',
   authentication,
   authorizeRole(['admin', 'user']),

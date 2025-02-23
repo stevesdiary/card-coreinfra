@@ -34,7 +34,7 @@ export const createCardProfile = async (validatedCardData: any) => {
           [Op.gt]: new Date()
         }
       },
-      order: [['createdAt', 'DESC']]  // Get the most recent card
+      order: [['createdAt', 'DESC']]
     });
     
     if (existingCard) {
@@ -66,10 +66,8 @@ export const createCardProfile = async (validatedCardData: any) => {
 
 export const getCardProfileById = async (id: string) => {
   try {
-    const cardProfile = await CardProfile.findOne({
-      where: { id }
-    });
-    
+    const cardProfile = await CardProfile.findByPk( id );
+    console.log(cardProfile)
     if (!cardProfile) {
       return {
         statusCode: 404,
@@ -100,7 +98,7 @@ export const getCardProfiles = async (limit: number, page: number) => {
     // let {limit, page} = ;
     // limit = limit ? parseInt(limit) : 10;
     // page = page ? parseInt(page) : 1;
-    const offset = (page - 1) * limit;
+    // const offset = (page - 1) * limit;
     const cardProfiles = await CardProfile.findAndCountAll({
       attributes:{ 
         exclude: ['pin'],

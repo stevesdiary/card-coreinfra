@@ -9,12 +9,12 @@ import {
 import { User } from '../../../user/models/user.model'; // Adjust import path as needed
 import { CardType } from '../../profile/card-profile.model'; // Adjust import path as needed
 
-export enum CardRequestStatus {
-  PENDING = 'PENDING',
-  APPROVED = 'APPROVED',
-  REJECTED = 'REJECTED',
-  PROCESSING = 'PROCESSING'
-}
+export const CardRequestStatus = {
+  PENDING: 'PENDING',
+  APPROVED: 'APPROVED',
+  REJECTED: 'REJECTED',
+  PROCESSING: 'PROCESSING'
+} as const;
 
 @Table({
   tableName: 'card_requests',
@@ -42,16 +42,34 @@ export class CardRequest extends Model {
   requested_card_type?: CardType;
 
   @Column({
-    type: DataType.ENUM(...Object.values(CardRequestStatus)),
-    allowNull: false,
-    defaultValue: CardRequestStatus.PENDING
+    type: DataType.ENUM('PENDING', 'APPROVED', 'REJECTED', 'PROCESSING'),
+    allowNull: false
   })
-  status?: CardRequestStatus;
+  status?: string;
+
+  @Column({
+    type: DataType.UUID,
+    allowNull: false
+  })
+  initiator?: string;
+
+  @Column({
+    type: DataType.DATE,
+    allowNull: false
+  })
+  request_date?: Date;
 
   @Column({
     type: DataType.TEXT
   })
   additional_notes?: string;
+
+  @Column({
+    type: DataType.SMALLINT,
+    allowNull: false,
+    defaultValue: 1
+  })
+  quantity?: number;
 
   @BelongsTo(() => User)
   user?: User;
