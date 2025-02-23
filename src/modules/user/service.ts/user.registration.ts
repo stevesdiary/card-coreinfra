@@ -3,12 +3,17 @@ import bcrypt from "bcrypt";
 
 import { getFromRedis, saveToRedis } from "../../../core/redis";
 import { CreationAttributes } from "sequelize";
-import { User } from "../models/user.model";
-import { UserResponseData } from "../types/type";
+import { User, UserRole } from "../models/user.model";
+import { UserResponseData, updateUserData } from "../types/type";
 import sendEmail from "./email.service";
 
 const salt = process.env.BCRYPT_SALT || 10;
-
+// interface userUpdateData {
+  // role?: UserRole;
+  // name?: string;
+  // email?: string;
+  // Add other updatable fields
+// }
 export const registerUser = async (userData: CreationAttributes<User>) => {
   try {
     const emailExists = await User.findOne({
@@ -177,7 +182,7 @@ export const getOneUser = async (id: string) => {
 
 export const updateUser = async (
   id: string,
-  userData: CreationAttributes<User>
+  validatedData: any
 ) => {
   try {
     const user = await User.findByPk(id);
@@ -189,12 +194,21 @@ export const updateUser = async (
         data: [],
       };
     }
-    const updatedUser = await user.update(userData);
+
+    // Ensure that role is assigned a valid UserRole
+    if (validatedData.role) {
+      validatedData.role = validatedData.role as UserRole; // Cast to UserRole if necessary
+    }
+    // const { password: _, ...userRegistrationData } = userCreationData;
+    
+    const updatedUser = await user.update(validatedData);
+    const { password: _, ...userUpdateData } = validatedData;
+    
     return {
       statusCode: 200,
       status: "success",
       message: "User updated",
-      data: updatedUser,
+      data: userUpdateData
     };
   } catch (error) {
     throw error;

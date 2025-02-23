@@ -1,4 +1,5 @@
 import { Request as ExpressRequest, Response } from 'express';
+import * as yup from 'yup';
 
 import { deleteUser, getAllUsers, getOneUser, updateUser } from '../service.ts/user.registration';
 import { userUpdateSchema, idSchema } from '../../../utils/validator';
@@ -52,8 +53,22 @@ const userController = {
       const update = await updateUser(id, validatedData);
       return res.status(update.statusCode).send({ status: update.status, message: update.message, data: update.data });
     } catch (error) {
-      return res.status(500).send({
-        error: error
+      if (error instanceof yup.ValidationError) {
+        return res.status(400).json({
+          status: 'error',
+          message: 'Validation failed',
+          errors: error.inner.map(err => ({
+            field: err.path,
+            message: err.message
+          }))
+        });
+      }
+
+      console.error('User update error:', error);
+      return res.status(500).json({
+        status: 'error',
+        message: 'Internal server error',
+        error: error instanceof Error ? error.message : 'Unknown error'
       });
     }
   },

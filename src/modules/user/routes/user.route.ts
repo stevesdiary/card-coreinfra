@@ -6,8 +6,8 @@ import authorizeRole from '../../../middlewares/authorise';
 const userRouter = Router();
 
 userRouter.put('/updateuser/:id', 
-  // authentication,
-  // authorizeRole(['user', 'admin']),
+  authentication,
+  authorizeRole(['user', 'admin']),
   async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       await userController.updateUser(req, res);
@@ -18,8 +18,8 @@ userRouter.put('/updateuser/:id',
 );
 
 userRouter.get('/all', 
-  // authentication,
-  // authorizeRole(['admin', 'user']),
+  authentication,
+  authorizeRole(['admin', 'user']),
   async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       await userController.getAllUsers(req, res);
@@ -30,8 +30,8 @@ userRouter.get('/all',
 );
 
 userRouter.get('/one/:id', 
-  // authentication,
-  // authorizeRole(['user', 'admin']),
+  authentication,
+  authorizeRole(['user', 'admin']),
   async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       await userController.getOneUser(req, res);
@@ -42,8 +42,8 @@ userRouter.get('/one/:id',
 );
 
 userRouter.delete('/delete/:id', 
-  // authentication,
-  // authorizeRole(['admin']),
+  authentication,
+  authorizeRole(['admin']),
   async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       await userController.deleteUser(req, res);
