@@ -3,7 +3,7 @@ dotenv.config();
 import { Sequelize } from 'sequelize-typescript';
 import { User } from '../modules/user/models/user.model';
 import { CardProfile } from '../modules/card/profile/card-profile.model';
-import { CardProfileFee } from '../modules/card/Fee/models/card.fee.model';
+import { CardFee } from '../modules/card/Fee/models/card.fee.model';
 import { CardRequest } from '../modules/card/Request/models/card-request.model';
 
 const sequelize = new Sequelize({
@@ -14,7 +14,7 @@ const sequelize = new Sequelize({
   password: process.env.DB_PASSWORD || 'postgres',
   database: process.env.DB_NAME || 'your_database',
 
-  models: [User, CardProfile, CardProfileFee, CardRequest],
+  models: [User, CardProfile, CardFee, CardRequest],
 });
 
 export default sequelize;
