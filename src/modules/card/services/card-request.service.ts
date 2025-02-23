@@ -1,19 +1,19 @@
+import { customAlphabet } from 'nanoid';
+
 import { CardRequest, CardRequestStatus } from '../Request/models/card-request.model';
 import { User } from '../../user/models/user.model';
 import { CardProfile } from '../profile/card-profile.model';
-import { request } from 'http';
+import { CardRequestData } from '../../user/types/type';
 
-interface CardRequestDTO {
-  user_id: string;
-  card_profile_id?: string;
-  status?: CardRequestStatus;
-  remarks?: string;
-}
 
-export const createCardRequest = async (data: CardRequestDTO) => {
+
+export const createCardRequest = async (requestData: any) => {
   try {
-    // Check if user exists
-    const user = await User.findByPk(data.user_id);
+    const nanoid = customAlphabet('1234567890', 10);
+    const batch_number = nanoid();
+    const request_date = new Date();
+    
+    const user = await User.findByPk(requestData.user_id);
     if (!user) {
       return {
         statusCode: 404,
@@ -22,23 +22,28 @@ export const createCardRequest = async (data: CardRequestDTO) => {
         data: null
       };
     }
-
-    // Optional: Check if card profile exists if provided
-    if (data.card_profile_id) {
-      const cardProfile = await CardProfile.findByPk(data.card_profile_id);
-      if (!cardProfile) {
-        return {
-          statusCode: 404,
-          status: 'fail',
-          message: 'Card profile not found',
-          data: null
-        };
+    const similarRequest = await CardRequest.findOne({
+      where: {
+        user_id: requestData.user_id,
+        requested_card_type: requestData.requested_card_type,
+        status: CardRequestStatus.PENDING
       }
+    });
+    if (similarRequest) {
+      return {
+        statusCode: 400,
+        status: 'fail',
+        message: 'You already have a pending request for this card type',
+        data: null
+      };
     }
-
+    
     const cardRequest = await CardRequest.create({
-      ...data,
-      status: data.status || CardRequestStatus.PENDING
+      ...requestData,
+      batch_number,
+      request_date,
+      initiator: requestData.user_id,
+      status: CardRequestStatus.PENDING || 'PENDING'
     });
 
     return {
@@ -91,7 +96,7 @@ export const getCardRequests = async (userId: string) => {
   }
 }
 
-export const updateCardRequest = async (requestId: string, data: Partial<CardRequestDTO>) => {
+export const updateCardRequest = async (requestId: string, data: Partial<CardRequest>) => {
   try {
     const cardRequest = await CardRequest.findByPk(requestId);
     if (!cardRequest) {
@@ -122,7 +127,7 @@ export const updateCardRequest = async (requestId: string, data: Partial<CardReq
   }
 }
 
-export const updateCardRequestStatus = async (requestId: string, data: Partial<CardRequestDTO>) => {
+export const updateCardRequestStatus = async (requestId: string, status: string) => {
   try {
     const cardRequest = await CardRequest.findByPk(requestId);
     if (!cardRequest) {
@@ -133,8 +138,11 @@ export const updateCardRequestStatus = async (requestId: string, data: Partial<C
         data: null
       };
     }
-
-    const updatedCardRequest = await cardRequest.update(data);
+    // const data = { status: CardRequestStatus };
+    const updatedCardRequest = await cardRequest.update({
+      status: status,
+      where: { id: requestId }
+    });
 
     return {
       statusCode: 200,
@@ -159,11 +167,7 @@ export const getCardRequestById = async (requestId: string) => {
       include: [
         { 
           model: User, 
-          attributes: ['id', 'first_name', 'last_name', 'email'] 
-        },
-        { 
-          model: CardProfile, 
-          attributes: ['id', 'card_number', 'card_type'] 
+          attributes: ['id', 'name', 'email'] 
         }
       ]
     })
@@ -182,12 +186,40 @@ export const getCardRequestById = async (requestId: string) => {
       data: cardRequest
     };
   } catch (error) {
-    console.error('Error updating card request:', error);
+    console.error('Error fetching card request:', error);
     return {
       statusCode: 500,
       status: 'error',
-      message: 'Failed to update card request',
+      message: 'Failed to fetch card request',
       data: null
     };
   }
 }
+
+export const getAllCardRequests = async () => {
+  try {
+    const cardRequests = await CardRequest.findAll({
+      include: [
+        { 
+          model: User, 
+          attributes: ['id', 'name', 'email'] 
+        }
+      ]
+    });
+
+    return {
+      statusCode: 200,
+      status: 'success',
+      message: 'Card requests retrieved',
+      data: cardRequests
+    };
+  } catch (error) {
+    console.error('Error retrieving card requests:', error);
+    return {
+      statusCode: 500,
+      status: 'error',
+      message: 'Failed to retrieve card requests',
+      data: null
+    };
+  }
+} 

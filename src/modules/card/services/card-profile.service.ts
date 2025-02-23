@@ -66,7 +66,11 @@ export const createCardProfile = async (validatedCardData: any) => {
 
 export const getCardProfileById = async (id: string) => {
   try {
-    const cardProfile = await CardProfile.findByPk( id );
+    const cardProfile = await CardProfile.findOne({ where: {id},
+      attributes: {
+        exclude: [ 'pin' ]
+      }
+    } );
     console.log(cardProfile)
     if (!cardProfile) {
       return {
@@ -99,7 +103,7 @@ export const getCardProfiles = async (limit: number, page: number) => {
     // limit = limit ? parseInt(limit) : 10;
     // page = page ? parseInt(page) : 1;
     // const offset = (page - 1) * limit;
-    const cardProfiles = await CardProfile.findAndCountAll({
+    const cardProfiles = await CardProfile.findAll({
       attributes:{ 
         exclude: ['pin'],
         include: ['currency']
