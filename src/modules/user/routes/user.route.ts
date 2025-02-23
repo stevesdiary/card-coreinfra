@@ -2,9 +2,14 @@ import { Router, Request, Response, NextFunction } from 'express';
 import userController from '../controllers/user.controller';
 import authentication from '../../../middlewares/authentication';
 import authorizeRole from '../../../middlewares/authorise';
+import { request } from 'http';
 
 const userRouter = Router();
-
+userRouter.get('/', (req: Request, res: Response) => {
+  res.json({
+    Message: 'App runnig'
+  })
+});
 userRouter.put('/updateuser/:id', 
   authentication,
   authorizeRole(['user', 'admin']),
