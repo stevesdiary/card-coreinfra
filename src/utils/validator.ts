@@ -1,5 +1,7 @@
 import * as yup from 'yup';
-import { CardType, CardStatus } from '../modules/card/profile/card-profile.model';
+import { CardType, CardStatus, Currency } from '../modules/card/profile/card-profile.model';
+import { CardRequestStatus } from '../modules/card/Request/models/card-request.model';
+import { FeeType, FrequencyType } from '../modules/card/Fee/models/card.fee.model';
 
 export const userRegistrationSchema = yup.object().shape({
   username: yup.string().required('Username is required'),
@@ -49,14 +51,62 @@ export const userVerificationSchema = yup.object().shape({
   code: yup.string().required('Verification code is required'),
 });
 
-export const idSchema = yup.string().uuid('Id must be a valid uuid').required('Id is required');
+export const emailSchema = yup.object().shape({
+  email: yup.string().email('Invalid email format').required('Email is required')
+});
+
+export const idSchema = yup.object().shape({
+  id: yup.string().uuid('Invalid card profile ID').required('Card profile ID is required')
+});
 
 export const cardProfileUpdateSchema = yup.object().shape({
+  card_profile_id: yup.string().uuid().optional(),
   status: yup.mixed().oneOf(Object.values(CardStatus)),
-  balance: yup.number().positive(),
+  // user_id: yup.string().uuid().required('User id is required'),
+  card_number: yup.string().optional(),
+  card_holder_name: yup.string().optional(),
+  card_type: yup.mixed().oneOf(Object.values(CardType)).optional(),
+});
+
+export const cardStatusSchema = yup.object().shape({
+  status: yup.mixed().oneOf(Object.values(CardStatus)).required('Status is required'),
+});
+
+export const cardRequestStatusSchema = yup.object().shape({
+  status: yup.mixed().oneOf(Object.values(CardRequestStatus)).required('Status is required'),
 });
 
 export const paginationSchema = yup.object().shape({
-  page: yup.number().positive().required(),
-  limit: yup.number().positive().required(),
+  page: yup.number().positive().optional(),
+  limit: yup.number().positive().optional(),
 });
+
+export const createRequestSchema = yup.object().shape({
+  user_id: yup.string().uuid().optional(),
+  requested_card_type: yup.mixed().oneOf(Object.values(CardType)).required('Requested card type is required'),
+  initiator: yup.string().uuid().optional(),
+  branch_name: yup.string().required('Branch name is required'),
+  batch_number: yup.string().optional(),
+  quantity: yup.number().positive().required('Quantity is required'),
+  additional_notes: yup.string().optional(),
+  // status: yup.mixed().oneOf(Object.values(CardRequestStatus)).optional(),
+});
+
+export const createFeeSchema = yup.object().shape({
+  card_profile_id: yup.string().uuid().required('Card profile id is required'),
+  card_type: yup.mixed().oneOf(Object.values(CardType)).optional(),
+  fee_type: yup.mixed().oneOf(Object.values(FeeType)).optional(),
+  currency: yup.mixed().oneOf(Object.values(Currency)).optional(),
+  frequency: yup.mixed().oneOf(Object.values(FrequencyType)).optional(),
+  amount: yup.number().required('Amount is required')
+})
+
+export const updateFeeSchema = yup.object().shape({
+  card_type: yup.mixed().oneOf(Object.values(CardType)).optional(),
+  fee_type: yup.mixed().oneOf(Object.values(FeeType)).optional(),
+  currency: yup.mixed().oneOf(Object.values(Currency)).optional(),
+  frequency: yup.mixed().oneOf(Object.values(FrequencyType)).optional(),
+  is_paid: yup.boolean().optional(),
+  is_active: yup.boolean().optional(),
+  amount: yup.number().required('Amount is required')
+})
