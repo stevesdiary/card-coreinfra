@@ -13,7 +13,6 @@ module.exports = {
       id: {
         type: Sequelize.UUID,
         primaryKey: true,
-        allowNull: false,
         defaultValue: Sequelize.UUIDV4
       },
       name: {
@@ -23,6 +22,10 @@ module.exports = {
       email: {
         type: Sequelize.STRING,
         allowNull: false,
+        unique: true
+      },
+      username: {
+        type: Sequelize.STRING,
         unique: true
       },
       password: {

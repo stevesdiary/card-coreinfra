@@ -3,13 +3,17 @@ import bcrypt from "bcrypt";
 
 import { getFromRedis, saveToRedis } from "../../../core/redis";
 import { CreationAttributes } from "sequelize";
-import { User } from "../models/user.model";
-import { UserResponseData } from "../types/type";
+import { User, UserRole } from "../models/user.model";
+import { UserResponseData, updateUserData } from "../types/type";
 import sendEmail from "./email.service";
-import { Response } from "express";
 
 const salt = process.env.BCRYPT_SALT || 10;
-
+// interface userUpdateData {
+  // role?: UserRole;
+  // name?: string;
+  // email?: string;
+  // Add other updatable fields
+// }
 export const registerUser = async (userData: CreationAttributes<User>) => {
   try {
     const emailExists = await User.findOne({
@@ -24,9 +28,11 @@ export const registerUser = async (userData: CreationAttributes<User>) => {
         message: `User already exists, login with your email and password`,
       };
     }
+    // console.log('userData', userData.username);
     const hashed = await bcrypt.hash(userData.password, salt);
     let userCreationData = {
       name: userData.name,
+      username: userData.username,
       email: userData.email,
       password: hashed,
     };
@@ -36,7 +42,7 @@ export const registerUser = async (userData: CreationAttributes<User>) => {
     if (user) {
       const nanoid = customAlphabet("1234567890", 6)();
       const verificationCode = nanoid;
-      await saveToRedis(`"verify" + ${user.email}`, verificationCode, 600);
+      await saveToRedis(`verify:${user.email}`, verificationCode, 600);
 
       const emailPayload = {
         to: user.email,
@@ -59,7 +65,7 @@ export const registerUser = async (userData: CreationAttributes<User>) => {
 
 export const verifyUser = async ( { email, code }: { email: string, code: string} ) => {
   try {
-    const verificationCode = await getFromRedis(`"verify" + ${email}`);
+    const verificationCode = await getFromRedis(`verify:${email}`);
     if (verificationCode === code) {
       await User.update(
         { verified: true },
@@ -79,6 +85,32 @@ export const verifyUser = async ( { email, code }: { email: string, code: string
       data: null
     };
   } catch (error) {
+    throw error;
+  }
+}
+
+export const resendCode = async (emailPayload: string ) => {
+  try {
+    const email = emailPayload;
+    const nanoid = customAlphabet("1234567890", 6)();
+    const verificationCode = nanoid;
+    await saveToRedis(`verify:${email}`, verificationCode, 600);
+
+    const emailData = {
+      to: email,
+      subject: "Email Verification",
+      text: `Your verification code is ${verificationCode}`,
+    };
+    await sendEmail(emailData);
+    return {
+      statusCode: 200,
+      status: "success",
+      message: "Verification code sent to your email",
+      data: [],
+    };
+
+  } catch (error) {
+    console.log('Error ocurred', error)
     throw error;
   }
 }
@@ -150,7 +182,7 @@ export const getOneUser = async (id: string) => {
 
 export const updateUser = async (
   id: string,
-  userData: CreationAttributes<User>
+  validatedData: any
 ) => {
   try {
     const user = await User.findByPk(id);
@@ -162,12 +194,21 @@ export const updateUser = async (
         data: [],
       };
     }
-    const updatedUser = await user.update(userData);
+
+    // Ensure that role is assigned a valid UserRole
+    if (validatedData.role) {
+      validatedData.role = validatedData.role as UserRole; // Cast to UserRole if necessary
+    }
+    // const { password: _, ...userRegistrationData } = userCreationData;
+    
+    const updatedUser = await user.update(validatedData);
+    const { password: _, ...userUpdateData } = validatedData;
+    
     return {
       statusCode: 200,
       status: "success",
       message: "User updated",
-      data: updatedUser,
+      data: userUpdateData
     };
   } catch (error) {
     throw error;

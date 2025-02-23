@@ -41,4 +41,16 @@ userRouter.get('/one/:id',
   }
 );
 
+userRouter.delete('/delete/:id', 
+  authentication,
+  authorizeRole(['admin']),
+  async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      await userController.deleteUser(req, res);
+    } catch (error) {
+      next(error);
+    }
+  }
+);
+
 export default userRouter;

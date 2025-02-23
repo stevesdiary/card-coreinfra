@@ -11,7 +11,7 @@ server.get("/home", (req, res) => {
   res.json({ message: "Hello, World! of tech." });
 });
 
-server.use('/v1', router);
+server.use('/api/v1', router);
 
 const startServer = async () => {
   try {
