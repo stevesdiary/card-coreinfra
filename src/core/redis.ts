@@ -8,10 +8,10 @@ let redisClient: Redis | null = null;
 async function initializeRedisConnection(): Promise<Redis> {
   if (!redisClient) {
     redisClient = new Redis({
-      host: 'localhost',
-      port: 6379,
-      // password: process.env.REDIS_PASSWORD || 'password',
-      db: 0,
+      host: process.env.REDIS_HOST || 'localhost',
+      port: Number(process.env.REDIS_PORT) || 6379,
+      password: process.env.REDIS_PASSWORD || 'password',
+      db: Number(process.env.REDIS_DATABASE_NAME) || 0,
       maxRetriesPerRequest: MAX_RETRIES,
       retryStrategy(times: number) {
         if (times > MAX_RETRIES) {
@@ -52,7 +52,7 @@ async function initializeRedisConnection(): Promise<Redis> {
       console.log(`Redis client reconnecting in ${delay}ms`);
     });
 
-    const shutdownSignals: NodeJS.Signals[] = [];//'SIGTERM', 'SIGINT', 'SIGUSR2'
+    const shutdownSignals: NodeJS.Signals[] = ['SIGTERM', 'SIGINT', 'SIGUSR2'];
     shutdownSignals.forEach(signal => {
       process.once(signal, async () => {
         console.log(`Received ${signal}, initiating graceful shutdown...`);
