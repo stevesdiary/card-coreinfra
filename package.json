@@ -16,7 +16,6 @@
   "main": "index.js",
   "scripts": {
     "build": "tsc",
-    "prestart": "npx sequelize-cli db:migrate",
     "start": "tsc && node build/main.js",
     "dev": "tsc -w & node build/main.js"
   },
