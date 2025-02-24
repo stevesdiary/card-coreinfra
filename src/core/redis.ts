@@ -110,7 +110,7 @@ async function gracefulShutdown(): Promise<void> {
 
 initializeRedisConnection().catch(err => {
   console.error('Failed to initialize Redis connection:', err);
-  // process.exit(1);
+  process.exit(1);
 });
 
 export { getFromRedis, saveToRedis };

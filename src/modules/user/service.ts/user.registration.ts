@@ -66,18 +66,42 @@ export const registerUser = async (userData: CreationAttributes<User>) => {
 export const verifyUser = async ( { email, code }: { email: string, code: string} ) => {
   try {
     const verificationCode = await getFromRedis(`verify:${email}`);
-    if (verificationCode === code) {
-      await User.update(
-        { verified: true },
-        { where: {email} },
-      );
+    const user = await User.findOne({ 
+      where: { email },
+      attributes: ['verified'] 
+    });
+
+    if (user && user.verified) {
       return {
         statusCode: 200,
         status: "success",
-        message: "User verified successfully",
+        message: "User already verified",
         data: null
       };
     }
+    if (verificationCode === code) {
+      const [updatedRowsCount] = await User.update(
+        { verified: true },
+        { where: { email } }
+      );
+
+      if (updatedRowsCount > 0) {
+        return {
+          statusCode: 200,
+          status: "success",
+          message: "User verified successfully",
+          data: null
+        };
+      } else {
+        return {
+          statusCode: 404,
+          status: "fail",
+          message: "User not found",
+          data: null
+        };
+      }
+    }
+
     return {
       statusCode: 400,
       status: "fail",
@@ -85,9 +109,17 @@ export const verifyUser = async ( { email, code }: { email: string, code: string
       data: null
     };
   } catch (error) {
-    throw error;
+    console.error('Verification error:', error);
+    
+    return {
+      statusCode: 500,
+      status: "error",
+      message: "Internal server error during verification",
+      data: null
+    };
   }
 }
+
 
 export const resendCode = async (emailPayload: string ) => {
   try {
