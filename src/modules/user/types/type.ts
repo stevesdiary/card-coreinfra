@@ -4,7 +4,8 @@ import { CardStatus, CardType } from '../../card/profile/card-profile.model';
 import { request } from 'http';
 
 export interface UserAttributes {
-    name?: string;
+    first_name?: string;
+    last_name?: string;
     email?: string;
     password?: string;
     confirm_password?: string;
@@ -20,7 +21,8 @@ export interface UserData extends Omit<UserAttributes, 'id'> {
 
 export interface TypedRequest extends Request {
   body: {
-    name: string;
+    first_name: string;
+    last_name: string;
     email: string;
     username: string;
     password: string;
@@ -29,7 +31,8 @@ export interface TypedRequest extends Request {
 }
 
 export interface UserData {
-  name?: string;
+  first_name?: string;
+  last_name?: string;
   email?: string;
   username: string;
   password?: string;
@@ -61,7 +64,7 @@ export interface UserResponseData {
 }
 
 export interface updateUserData {
-  // name?: string;
+  // first_name?: string;
   // email?: string;
   // username?: string;
   // password?: string;

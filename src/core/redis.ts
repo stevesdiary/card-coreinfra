@@ -36,10 +36,6 @@ async function initializeRedisConnection(): Promise<Redis> {
       console.log('Redis connected successfully');
     });
 
-    redisClient.on('ready', () => {
-      console.log('Redis client is ready to accept commands');
-    });
-
     redisClient.on('error', (err) => {
       console.error('Redis client error:', err);
     });

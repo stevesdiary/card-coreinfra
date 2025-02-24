@@ -6,13 +6,36 @@ import { Op } from 'sequelize';
 
 export const createCardProfile = async (validatedCardData: any) => {
   try {
+    if (!validatedCardData.user_id) {
+      console.error('Missing user_id');
+      return {
+        statusCode: 400,
+        status: 'error',
+        message: 'User ID is required',
+        data: null
+      };
+    }
+
+    if (!validatedCardData.card_type) {
+      console.error('Missing card_type');
+      return {
+        statusCode: 400,
+        status: 'error',
+        message: 'Card type is required',
+        data: null
+      };
+    }
+
     const nanoid = customAlphabet('0123456789', 16);
     const cardNumber = nanoid();
     const cvv2 = nanoid(3); 
     const expiryDate = new Date();
-    expiryDate.setFullYear(expiryDate.getFullYear() + 4);
+    expiryDate.setFullYear(expiryDate.getUTCDate() + 4);
 
-    let cardProfileCreationData = {
+    const cardProfileCreationData = {
+      user_id: String(validatedCardData.user_id),
+      card_type: String(validatedCardData.card_type),
+      card_holder_name: validatedCardData.card_holder_name, //||`${user.first_name} ${user.last_name}`,
       ...validatedCardData,
       card_number: cardNumber,
       expiry_date: expiryDate,
@@ -20,6 +43,10 @@ export const createCardProfile = async (validatedCardData: any) => {
       pin: '0000',
       status: CardStatus.PENDING
     };
+    if (!cardProfileCreationData.card_holder_name) {
+      throw new Error('Card holder name is required');
+    }
+    console.log(validatedCardData.card_holder_name, 'DATA')
 
     if (!validatedCardData.user_id || !validatedCardData.card_type) {
       throw new Error('Missing required card profile data');
@@ -45,7 +72,9 @@ export const createCardProfile = async (validatedCardData: any) => {
         data: null
       };
     }
+    console.log("REACHING HERE")
     const cardProfile = await CardProfile.create(cardProfileCreationData);
+    console.log('CARD PROFILE', cardProfile);
     const { pin: _, ...cardCreationData } = cardProfileCreationData;
     return {
       statusCode: 201,
@@ -55,12 +84,7 @@ export const createCardProfile = async (validatedCardData: any) => {
     };
   } catch (error) {
     console.error('Error creating card profile:', error);
-    return {
-      statusCode: 500,
-      status: 'error',
-      message: 'Failed to create card profile',
-      data: null
-    };
+    throw error;
   }
 };
 
@@ -71,7 +95,7 @@ export const getCardProfileById = async (id: string) => {
         exclude: [ 'pin' ]
       }
     } );
-    console.log(cardProfile)
+    // console.log(cardProfile)
     if (!cardProfile) {
       return {
         statusCode: 404,
@@ -89,12 +113,7 @@ export const getCardProfileById = async (id: string) => {
     };
   } catch (error) {
     console.error('Error retrieving card profile:', error);
-    return {
-      statusCode: 500,
-      status: 'error',
-      message: 'Failed to retrieve card profile',
-      data: null
-    };
+    throw error;
   }
 };
 export const getCardProfiles = async (limit: number, page: number) => {
@@ -128,12 +147,7 @@ export const getCardProfiles = async (limit: number, page: number) => {
     };
   } catch (error) {
     console.error('Error retrieving card profiles:', error);
-    return {
-      statusCode: 500,
-      status: 'error',
-      message: 'Failed to retrieve card profiles',
-      data: null
-    };
+    throw error;
   }
 };
 
@@ -160,12 +174,7 @@ export const deleteCardProfile = async (id: string) => {
     };
   } catch (error) {
     console.error('Error deleting card profile:', error);
-    return {
-      statusCode: 500,
-      status: 'error',
-      message: 'Failed to delete card profile',
-      data: null
-    };
+    throw error;
   }
 }
 
@@ -193,11 +202,6 @@ export const updateCardProfile = async (id: string, data: any) => {
     };
   } catch (error) {
     console.error('Error updating card profile:', error);
-    return {
-      statusCode: 500,
-      status: 'error',
-      message: 'Failed to update card profile',
-      data: null
-    };
+    throw error;
   }
 };

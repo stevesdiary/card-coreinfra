@@ -25,7 +25,7 @@ const cardProfileController = {
 
       const profileBody = { ...req.body, user_id };
       
-      const validatedData = await cardValidationSchema.validate(profileBody, { abortEarly: false });
+      const validatedData = await cardValidationSchema.validate(req.body, { abortEarly: false });
       const cardProfile = await createCardProfile({ 
         card_type: validatedData.card_type,
         card_holder_name: validatedData.card_holder_name,
