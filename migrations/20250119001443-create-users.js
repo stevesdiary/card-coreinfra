@@ -33,7 +33,6 @@ module.exports = {
       },
       role: {
         type: Sequelize.ENUM('admin', 'user'),
-        allowNull: false,
         defaultValue: 'user'
       },
       verified: {

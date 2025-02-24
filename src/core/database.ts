@@ -15,13 +15,13 @@ const sequelize = new Sequelize({
   password: process.env.DB_PASSWORD || 'postgres',
   database: process.env.DB_NAME || 'your_database',
   logging: true,
-  // dialectOptions: {
-  //   ssl: {
-  //     require: true,
-  //     rejectUnauthorized: false, // More secure for production
-  //     ca: fs.readFileSync('/root.crt').toString()
-  //   }
-  // },
+  dialectOptions: {
+    ssl: {
+      require: true,
+      rejectUnauthorized: false, // More secure for production
+      // ca: fs.readFileSync('/root.crt').toString()
+    }
+  },
 
   models: [User, CardProfile, CardFee, CardRequest],
 });

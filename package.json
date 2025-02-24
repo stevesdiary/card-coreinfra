@@ -16,6 +16,7 @@
   "main": "index.js",
   "scripts": {
     "build": "tsc",
+    "prestart": "npx sequelize-cli db:migrate",
     "start": "tsc && node build/src/main.js",
     "dev": "tsc -w & node build/src/main.js"
   },
@@ -42,6 +43,7 @@
   },
   "dependencies": {
     "@json2csv/node": "^7.0.6",
+    "@neondatabase/serverless": "^0.10.4",
     "@types/json2csv": "^5.0.7",
     "bcrypt": "^5.1.1",
     "cookie-parser": "^1.4.7",
