@@ -1,4 +1,5 @@
 import dotenv from 'dotenv';
+import fs from 'fs'
 dotenv.config();
 import { Sequelize } from 'sequelize-typescript';
 import { User } from '../modules/user/models/user.model';
@@ -14,15 +15,16 @@ const sequelize = new Sequelize({
   password: process.env.DB_PASSWORD || 'postgres',
   database: process.env.DB_NAME || 'your_database',
   logging: true,
-  dialectOptions: {
-    ssl: {
-      require: true,
-      rejectUnauthorized: false, // More secure for production
-      ca: process.env.DB_SSL_CA
-    }
-  },
+  // dialectOptions: {
+  //   ssl: {
+  //     require: true,
+  //     rejectUnauthorized: false, // More secure for production
+  //     ca: fs.readFileSync('/root.crt').toString()
+  //   }
+  // },
 
   models: [User, CardProfile, CardFee, CardRequest],
 });
+
 
 export default sequelize;

@@ -17,8 +17,8 @@
   "scripts": {
     "build": "tsc",
     "prestart": "npx sequelize-cli db:migrate",
-    "start": "tsc && nodemon dist/main.js",
-    "dev": "tsc -w & nodemon dist/main.js"
+    "start": "tsc && node build/main.js",
+    "dev": "tsc -w & node build/main.js"
   },
   "devDependencies": {
     "@jest/globals": "^29.7.0",

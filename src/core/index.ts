@@ -8,7 +8,7 @@ const port = process.env.LOCAL_PORT || 3000;
 server.use(express.json());
 
 server.get("/home", (req, res) => {
-  res.json({ message: "Hello, World! of tech." });
+  res.json({ message: "Hello, World!." });
 });
 
 server.use('/api/v1', router);
