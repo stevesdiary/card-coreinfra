@@ -52,7 +52,7 @@ async function initializeRedisConnection(): Promise<Redis> {
       console.log(`Redis client reconnecting in ${delay}ms`);
     });
 
-    const shutdownSignals: NodeJS.Signals[] = ['SIGTERM', 'SIGINT', 'SIGUSR2'];
+    const shutdownSignals: NodeJS.Signals[] = [];//'SIGTERM', 'SIGINT', 'SIGUSR2'
     shutdownSignals.forEach(signal => {
       process.once(signal, async () => {
         console.log(`Received ${signal}, initiating graceful shutdown...`);
