@@ -167,7 +167,7 @@ export const getCardRequestById = async (requestId: string) => {
       include: [
         { 
           model: User, 
-          attributes: ['id', 'name', 'email'] 
+          attributes: ['id', 'first_name', 'last_name', 'email'] 
         }
       ]
     })
@@ -202,7 +202,7 @@ export const getAllCardRequests = async () => {
       include: [
         { 
           model: User, 
-          attributes: ['id', 'name', 'email'] 
+          attributes: ['id', 'first_name', 'last_name', 'email'] 
         }
       ]
     });

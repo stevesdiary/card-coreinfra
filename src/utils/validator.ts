@@ -5,7 +5,8 @@ import { FeeType, FrequencyType } from '../modules/card/Fee/models/card.fee.mode
 
 export const userRegistrationSchema = yup.object().shape({
   username: yup.string().required('Username is required'),
-  name: yup.string().required('Name is required'),
+  first_name: yup.string().required('Name is required'),
+  last_name: yup.string().required('Last name is required'),
   email: yup.string().email('Invalid email format').required('Email is required'),
   password: yup.string().trim()
     .min(6, 'Password must be at least 6 characters')
@@ -23,7 +24,8 @@ export const userRegistrationSchema = yup.object().shape({
 });
 
 export const userUpdateSchema = yup.object().shape({
-  name: yup.string().optional(),
+  first_name: yup.string().optional(),
+  last_name: yup.string().optional(),
   email: yup.string().email('Invalid email format').optional(),
   password: yup.string().trim()
   .min(6, 'Password must be at least 6 characters')
@@ -36,9 +38,9 @@ export const userUpdateSchema = yup.object().shape({
 });
 
 export const cardValidationSchema = yup.object().shape({
-  user_id: yup.string().uuid().required(),
-  card_holder_name: yup.string().required(),
-  card_type: yup.mixed().oneOf(Object.values(CardType)).required(),
+  user_id: yup.string().uuid().optional(),
+  card_holder_name: yup.string().required('card holder name is required'),
+  card_type: yup.mixed().oneOf(Object.values(CardType)).required('Card type is required'),
 });
 
 export const loginSchema = yup.object().shape({

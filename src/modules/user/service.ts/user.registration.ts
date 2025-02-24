@@ -10,7 +10,7 @@ import sendEmail from "./email.service";
 const salt = process.env.BCRYPT_SALT || 10;
 // interface userUpdateData {
   // role?: UserRole;
-  // name?: string;
+  // first_name?: string;
   // email?: string;
   // Add other updatable fields
 // }
@@ -31,7 +31,8 @@ export const registerUser = async (userData: CreationAttributes<User>) => {
     // console.log('userData', userData.username);
     const hashed = await bcrypt.hash(userData.password, salt);
     let userCreationData = {
-      name: userData.name,
+      first_name: userData.first_name,
+      last_name: userData.last_name,
       username: userData.username,
       email: userData.email,
       password: hashed,

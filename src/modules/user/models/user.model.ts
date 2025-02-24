@@ -20,7 +20,13 @@ export class User extends Model {
     type: DataType.STRING,
     allowNull: false
   })
-  name!: string;
+  first_name!: string;
+
+  @Column({
+    type: DataType.STRING,
+    allowNull: false
+  })
+  last_name!: string;
 
   @Unique
   @Column({
@@ -58,7 +64,8 @@ export class User extends Model {
 }
 
 export interface IUserRegistration {
-  name: string;
+  first_name: string;
+  last_name: string;
   email: string;
   username: string;
   password: string;

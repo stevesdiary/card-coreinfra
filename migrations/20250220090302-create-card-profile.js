@@ -1,22 +1,15 @@
 'use strict';
 
 const { UUIDV4 } = require('sequelize');
-const { now } = require('sequelize/lib/utils');
 
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up (queryInterface, Sequelize) {
-    /**
-     * Add altering commands here.
-     *
-     * Example:
-     * await queryInterface.createTable('users', { id: Sequelize.INTEGER });
-     */
     await queryInterface.createTable('card_profiles', {
       id: {
         type: Sequelize.UUID,
         primaryKey: true,
-        defaultValue: UUIDV4
+        defaultValue: Sequelize.UUIDV4
       },
       user_id: {
         type: Sequelize.UUID,
@@ -28,14 +21,15 @@ module.exports = {
       },
       card_number: {
         type: Sequelize.STRING,
-        allowNull: false
+        allowNull: false,
+        unique: true
       },
       card_holder_name: {
         type: Sequelize.STRING,
         allowNull: false
       },
       card_type: {
-        type: Sequelize.STRING,
+        type: Sequelize.ENUM('VIRTUAL', 'CREDIT', 'DEBIT'),
         allowNull: false
       },
       expiry_date: {
@@ -48,6 +42,7 @@ module.exports = {
       },
       pin: {
         type: Sequelize.STRING,
+        allowNull: true
       },
       status: {
         type: Sequelize.ENUM('PENDING', 'INACTIVE', 'ACTIVE', 'BLOCKED'),
@@ -62,28 +57,25 @@ module.exports = {
         defaultValue: 'NGN'
       },
       branch_blacklist: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
+        allowNull: true
       },
       createdAt: {
         type: Sequelize.DATE,
-        defaultValue: Date.now()
+        defaultValue: Sequelize.NOW
       },
       updatedAt: {
-        type: Sequelize.DATE
+        type: Sequelize.DATE,
+        defaultValue: Sequelize.NOW
       },
       deletedAt: {
-        type: Sequelize.DATE
+        type: Sequelize.DATE,
+        allowNull: true
       }
-    })
+    });
   },
 
   async down (queryInterface, Sequelize) {
-    /**
-     * Add reverting commands here.
-     *
-     * Example:
-     * await queryInterface.dropTable('users');
-     */
     await queryInterface.dropTable('card_profiles');
   }
 };
