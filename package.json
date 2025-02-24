@@ -16,8 +16,8 @@
   "main": "index.js",
   "scripts": {
     "build": "tsc",
-    "start": "tsc && node build/main.js",
-    "dev": "tsc -w & node build/main.js"
+    "start": "tsc && node build/src/main.js",
+    "dev": "tsc -w & node build/src/main.js"
   },
   "devDependencies": {
     "@jest/globals": "^29.7.0",
