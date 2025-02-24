@@ -4,7 +4,7 @@ import cookieParser from 'cookie-parser';
 import { Response } from 'express';
 import { User } from "../../user/models/user.model";
 
-const jwtExpiry = process.env.JWT_EXPIRY || '1h';
+const jwtExpiry = process.env.JWT_EXPIRES_IN || '5h';
 const jwtSecret = process.env.JWT_SECRET || 'secret';
 
 export const loginUser = async (email: string, password: string, res: Response) => {
@@ -20,11 +20,11 @@ export const loginUser = async (email: string, password: string, res: Response) 
         }
 
         const token = jwt.sign({ 
-          id: user.id, 
-          email: user.email, 
-          role: user.role }, 
-          jwtSecret as string, 
-          { expiresIn: jwtExpiry } as SignOptions
+            id: user.id, 
+            email: user.email, 
+            role: user.role }, 
+            jwtSecret as string, 
+            { expiresIn: jwtExpiry } as SignOptions
         );
         
         res.cookie('sessionId', token, {
