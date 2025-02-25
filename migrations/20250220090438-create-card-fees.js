@@ -12,7 +12,6 @@ module.exports = {
       card_type: {
         type: Sequelize.ENUM('DEBIT', 'CREDIT', 'VIRTUAL'),
         allowNull: false
-        // Remove the references block
       },
       fee_type: {
         type: Sequelize.STRING,
