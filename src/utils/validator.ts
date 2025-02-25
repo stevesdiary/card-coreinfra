@@ -1,5 +1,5 @@
 import * as yup from 'yup';
-import { CardType, CardStatus, Currency } from '../modules/card/profile/card-profile.model';
+import { CardType, CardStatus, Currency } from '../modules/card/card-profile/model/card-profile.model';
 import { CardRequestStatus } from '../modules/card/Request/models/card-request.model';
 import { FeeType, FrequencyType } from '../modules/card/Fee/models/card.fee.model';
 

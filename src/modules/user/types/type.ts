@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { UserRole } from '../../user/models/user.model';
-import { CardStatus, CardType } from '../../card/profile/card-profile.model';
+import { CardStatus, CardType } from '../../card/card-profile/model/card-profile.model';
 import { request } from 'http';
 
 export interface UserAttributes {

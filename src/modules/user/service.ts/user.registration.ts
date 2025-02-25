@@ -8,12 +8,7 @@ import { UserResponseData, updateUserData } from "../types/type";
 import sendEmail from "./email.service";
 
 const salt = process.env.BCRYPT_SALT || 10;
-// interface userUpdateData {
-  // role?: UserRole;
-  // first_name?: string;
-  // email?: string;
-  // Add other updatable fields
-// }
+
 export const registerUser = async (userData: CreationAttributes<User>) => {
   try {
     const emailExists = await User.findOne({
@@ -28,7 +23,7 @@ export const registerUser = async (userData: CreationAttributes<User>) => {
         message: `User already exists, login with your email and password`,
       };
     }
-    // console.log('userData', userData.username);
+
     const hashed = await bcrypt.hash(userData.password, salt);
     let userCreationData = {
       first_name: userData.first_name,
@@ -228,11 +223,10 @@ export const updateUser = async (
       };
     }
 
-    // Ensure that role is assigned a valid UserRole
     if (validatedData.role) {
       validatedData.role = validatedData.role as UserRole; // Cast to UserRole if necessary
     }
-    // const { password: _, ...userRegistrationData } = userCreationData;
+    
     
     const updatedUser = await user.update(validatedData);
     const { password: _, ...userUpdateData } = validatedData;

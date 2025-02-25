@@ -1,6 +1,5 @@
 import { CardFee } from "../Fee/models/card.fee.model";
-import { CardProfile } from "../profile/card-profile.model";
-
+import { CardProfile } from "../card-profile/model/card-profile.model";
 
 export const createCardFee = async (cardFeeData: any) => {
   try {
@@ -13,28 +12,7 @@ export const createCardFee = async (cardFeeData: any) => {
         data: null
       }
     }
-    // const uniqueFields = {
-    //   where: {
-    //     fee_type: cardFeeData.fee_type,
-    //     card_type: cardFeeData.card_type,
-    //     amount: cardFeeData.amount,
-    //     currency: cardFeeData.currency,
-    //     is_active: true
-    //     // Add other fields that should prevent duplicates
-    //   }
-    // };
 
-    // const [cardFee, created] = await CardFee.findOrCreate({
-    //   ...uniqueFields,
-    //   defaults: {
-    //     ...cardFeeData,
-
-    //     is_active: true,
-    //   }
-    // });
-    
-    
-    
     const createFee = await CardFee.findOrCreate(cardFeeData)
     
     return {
