@@ -8,49 +8,36 @@ import {
   getCardProfiles,
   deleteCardProfile
 } from '../../services/card-profile.service';
-import { CardStatus } from '../card-profile.model';
+import { CardStatus } from '../model/card-profile.model';
 import { cardValidationSchema, idSchema, paginationSchema, cardProfileUpdateSchema } from '../../../../utils/validator';
+import { validatedCardData } from '../../../user/types/type';
+// import { createCardProfile } from '../../services/card-profile.service';
 
 const cardProfileController = {
   createProfile: async (req: Request, res: Response): Promise<Response> => {
     try {
-      const user_id = req.user?.id ?? '';
       
-      if (!user_id) {
-        return res.status(401).json({
-          status: 'error',
-          message: 'Unauthorized: User ID not found'
-        });
-      }
-
-      const profileBody = { ...req.body, user_id };
-      
-      const validatedData = await cardValidationSchema.validate(req.body, { abortEarly: false });
-      const cardProfile = await createCardProfile({ 
-        card_type: validatedData.card_type,
-        card_holder_name: validatedData.card_holder_name,
-        user_id
-      });
-
-      return res.status(cardProfile.statusCode || 201).json(cardProfile);
+      const validatedCardData = await cardValidationSchema.validate(req.body, {abortEarly: false});
+      const user_id = req.user?.id || validatedCardData.user_id as string;
+      const cardProfile = await createCardProfile(user_id, validatedCardData);
+      return res.status(cardProfile.statusCode).json(cardProfile);
     } catch (error) {
+      console.log('Error', error);
       if (error instanceof yup.ValidationError) {
         return res.status(400).json({
           status: 'error',
           message: 'Validation failed',
-          errors: error.inner.map(err => ({
-            field: err.path,
-            message: err.message
+          errors: error.errors.map(errorMsg => ({
+            message: errorMsg
           }))
         });
       }
-
-      console.error('Card Profile Creation Error:', error);
-
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+      
       return res.status(500).json({
         status: 'error',
         message: 'Internal server error',
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: errorMessage
       });
     }
   },

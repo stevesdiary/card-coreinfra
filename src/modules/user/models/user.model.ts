@@ -1,5 +1,5 @@
-import { Table, Column, Model, DataType, IsUUID, PrimaryKey, Unique, Default, HasOne } from 'sequelize-typescript';
-import { CardProfile } from '../../card/profile/card-profile.model';
+import { Table, Column, Model, DataType, IsUUID, PrimaryKey, Unique, Default, HasOne, HasMany } from 'sequelize-typescript';
+import { CardProfile } from '../../card/card-profile/model/card-profile.model';
 
 export enum UserRole {
   ADMIN = 'admin',
@@ -59,8 +59,11 @@ export class User extends Model {
   @Column(DataType.BOOLEAN)
   verified!: boolean;
 
-  @HasOne(() => CardProfile)
-  card_profile!: CardProfile;
+  // @HasOne(() => CardProfile)
+  // card_profile!: CardProfile;
+
+  @HasMany(() => CardProfile)
+  card_profiles?: CardProfile[];
 }
 
 export interface IUserRegistration {

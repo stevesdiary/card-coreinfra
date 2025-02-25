@@ -3,7 +3,7 @@ import fs from 'fs'
 dotenv.config();
 import { Sequelize } from 'sequelize-typescript';
 import { User } from '../modules/user/models/user.model';
-import { CardProfile } from '../modules/card/profile/card-profile.model';
+import { CardProfile } from '../modules/card/card-profile/model/card-profile.model';
 import { CardFee } from '../modules/card/Fee/models/card.fee.model';
 import { CardRequest } from '../modules/card/Request/models/card-request.model';
 
@@ -27,4 +27,4 @@ const sequelize = new Sequelize({
 });
 
 
-export default sequelize;
+export { sequelize };

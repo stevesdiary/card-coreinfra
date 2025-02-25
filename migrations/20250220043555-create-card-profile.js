@@ -1,15 +1,20 @@
 'use strict';
 
-const { UUIDV4 } = require('sequelize');
-
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up (queryInterface, Sequelize) {
+    /**
+     * Add altering commands here.
+     *
+     * Example:
+     * await queryInterface.createTable('users', { id: Sequelize.INTEGER });
+     */
     await queryInterface.createTable('card_profiles', {
       id: {
         type: Sequelize.UUID,
         primaryKey: true,
-        defaultValue: Sequelize.UUIDV4
+        defaultValue: Sequelize.UUIDV4,
+        allowNull: false
       },
       user_id: {
         type: Sequelize.UUID,
@@ -17,23 +22,25 @@ module.exports = {
         references: {
           model: 'users',
           key: 'id'
-        }
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'CASCADE'
+      },
+      card_type: {
+        type: Sequelize.ENUM('DEBIT', 'CREDIT'),
+        allowNull: false
+      },
+      card_holder_name: {
+        type: Sequelize.STRING,
+        allowNull: false
       },
       card_number: {
         type: Sequelize.STRING,
         allowNull: false,
         unique: true
       },
-      card_holder_name: {
-        type: Sequelize.STRING,
-        allowNull: false
-      },
-      card_type: {
-        type: Sequelize.ENUM('VIRTUAL', 'CREDIT', 'DEBIT'),
-        allowNull: false
-      },
       expiry_date: {
-        type: Sequelize.STRING,
+        type: Sequelize.DATE,
         allowNull: false
       },
       cvv: {
@@ -42,40 +49,38 @@ module.exports = {
       },
       pin: {
         type: Sequelize.STRING,
-        allowNull: true
+        allowNull: false
       },
       status: {
-        type: Sequelize.ENUM('PENDING', 'INACTIVE', 'ACTIVE', 'BLOCKED'),
+        type: Sequelize.ENUM('PENDING', 'ACTIVE', 'BLOCKED'),
         defaultValue: 'PENDING'
       },
       balance: {
         type: Sequelize.DECIMAL(10, 2),
-        defaultValue: 0.00
+        defaultValue: 0
       },
       currency: {
-        type: Sequelize.ENUM('NGN', 'USD', 'EUR', 'GBP'),
-        defaultValue: 'NGN'
-      },
-      branch_blacklist: {
         type: Sequelize.STRING,
-        allowNull: true
+        defaultValue: 'NGN'
       },
       createdAt: {
         type: Sequelize.DATE,
-        defaultValue: Sequelize.NOW
+        allowNull: false
       },
       updatedAt: {
         type: Sequelize.DATE,
-        defaultValue: Sequelize.NOW
-      },
-      deletedAt: {
-        type: Sequelize.DATE,
-        allowNull: true
+        allowNull: false
       }
     });
   },
 
   async down (queryInterface, Sequelize) {
+    /**
+     * Add reverting commands here.
+     *
+     * Example:
+     * await queryInterface.dropTable('users');
+     */
     await queryInterface.dropTable('card_profiles');
   }
 };

@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response, Router } from 'express';
 
 
-import cardProfileController from '../profile/controller/card-profile.controller';
+import cardProfileController from '../card-profile/controller/card-profile.cotroller';
 import cardRequestController from '../Request/controller/card-request.controller';
 import authentication from '../../../middlewares/authentication';
 import authorizeRole from '../../../middlewares/authorise';

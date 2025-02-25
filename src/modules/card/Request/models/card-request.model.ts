@@ -6,8 +6,8 @@ import {
   ForeignKey, 
   BelongsTo 
 } from 'sequelize-typescript';
-import { User } from '../../../user/models/user.model'; // Adjust import path as needed
-import { CardType } from '../../profile/card-profile.model'; // Adjust import path as needed
+import { User } from '../../../user/models/user.model';
+import { CardType } from '../../card-profile/model/card-profile.model';
 
 export const CardRequestStatus = {
   PENDING: 'PENDING',

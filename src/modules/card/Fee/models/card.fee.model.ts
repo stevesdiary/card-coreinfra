@@ -6,7 +6,7 @@ import {
   ForeignKey, 
   BelongsTo 
 } from 'sequelize-typescript';
-import { CardProfile } from '../../profile/card-profile.model';
+import { CardProfile } from '../../card-profile/model/card-profile.model';
 
 export enum CardType {
   VIRTUAL = 'VIRTUAL',

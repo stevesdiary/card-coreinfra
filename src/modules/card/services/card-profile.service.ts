@@ -1,90 +1,85 @@
 import { customAlphabet } from 'nanoid';
+// import {sequelize} from '../../../core/database'
+import { CardProfile, CardStatus, Currency } from '../card-profile/model/card-profile.model';
+import { CardType } from '../card-profile/model/card-profile.model';
+import { CreationAttributes, Op } from 'sequelize';
+import sequelize from 'sequelize/types/sequelize';
 
-import { CardProfile, CardStatus } from '../profile/card-profile.model';
-// import { validatedCardData } from '../../user/types/type';
-import { Op } from 'sequelize';
 
-export const createCardProfile = async (validatedCardData: any) => {
+export const createCardProfile = async (user_id: string, validatedCardData: CreationAttributes<CardProfile>) => {
   try {
-    if (!validatedCardData.user_id) {
-      console.error('Missing user_id');
+    if (!validatedCardData.user_id || !validatedCardData.card_type || !validatedCardData.card_holder_name) {
       return {
         statusCode: 400,
         status: 'error',
-        message: 'User ID is required',
-        data: null
+        message: 'User ID, card type, and card holder name are required',
+        data: null,
       };
     }
 
-    if (!validatedCardData.card_type) {
-      console.error('Missing card_type');
-      return {
-        statusCode: 400,
-        status: 'error',
-        message: 'Card type is required',
-        data: null
-      };
-    }
+    const nanoid = customAlphabet('0123456789');
+    const cardNumber = nanoid(16);
+    const cvv2 = nanoid(3);
 
-    const nanoid = customAlphabet('0123456789', 16);
-    const cardNumber = nanoid();
-    const cvv2 = nanoid(3); 
     const expiryDate = new Date();
-    expiryDate.setFullYear(expiryDate.getUTCDate() + 4);
+    expiryDate.setFullYear(expiryDate.getFullYear() + 4); // 4 years from now
 
     const cardProfileCreationData = {
-      user_id: String(validatedCardData.user_id),
-      card_type: String(validatedCardData.card_type),
-      card_holder_name: validatedCardData.card_holder_name, //||`${user.first_name} ${user.last_name}`,
-      ...validatedCardData,
+      user_id: user_id,
+      card_type: validatedCardData.card_type,
+      card_holder_name: validatedCardData.card_holder_name,
       card_number: cardNumber,
       expiry_date: expiryDate,
       cvv: cvv2,
-      pin: '0000',
-      status: CardStatus.PENDING
+      pin: validatedCardData.pin || '0000',
+      status: CardStatus.PENDING,
+      balance: validatedCardData.balance || 0.00,
+      currency: validatedCardData.currency || 'NGN',
     };
-    if (!cardProfileCreationData.card_holder_name) {
-      throw new Error('Card holder name is required');
-    }
-    console.log(validatedCardData.card_holder_name, 'DATA')
 
-    if (!validatedCardData.user_id || !validatedCardData.card_type) {
-      throw new Error('Missing required card profile data');
-    }
-
+    // Check for existing active card
     const existingCard = await CardProfile.findOne({
       where: {
-        user_id: validatedCardData.user_id,
+        user_id: user_id,
         card_type: validatedCardData.card_type,
-        // status: CardStatus.ACTIVE,
         expiry_date: {
-          [Op.gt]: new Date()
-        }
+          [Op.gt]: new Date(),
+        },
       },
-      order: [['createdAt', 'DESC']]
+      order: [['createdAt', 'DESC']],
     });
-    
+
     if (existingCard) {
       return {
         statusCode: 400,
         status: 'error',
         message: 'You already have an active card of this type',
-        data: null
+        data: null,
       };
     }
-    console.log("REACHING HERE")
-    const cardProfile = await CardProfile.create(cardProfileCreationData);
-    console.log('CARD PROFILE', cardProfile);
-    const { pin: _, ...cardCreationData } = cardProfileCreationData;
+
+  
+  
+    const cardProfile = CardProfile.build(cardProfileCreationData);
+    await cardProfile.save();
+    
+    // Exclude sensitive fields from response
+    const { pin, ...safeCardData } = cardProfile.get({ plain: true });
+
     return {
       statusCode: 201,
       status: 'success',
       message: 'Card profile created',
-      data: cardCreationData
+      data: safeCardData,
     };
   } catch (error) {
     console.error('Error creating card profile:', error);
-    throw error;
+    return {
+      statusCode: 500,
+      status: 'error',
+      message: error || 'Failed to create card profile',
+      data: null,
+    };
   }
 };
 
@@ -130,7 +125,7 @@ export const getCardProfiles = async (limit: number, page: number) => {
     });
     // const { pin: _, ...cardProfileData } = cardProfiles;
     
-    if (!cardProfiles) {
+    if (!cardProfiles || cardProfiles.length < 1) {
       return {
         statusCode: 404,
         status: 'fail',
@@ -142,7 +137,7 @@ export const getCardProfiles = async (limit: number, page: number) => {
     return {
       statusCode: 200,
       status: 'success',
-      message: 'Card profile retrieved',
+      message: 'Card profiles retrieved',
       data: cardProfiles
     };
   } catch (error) {

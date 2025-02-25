@@ -1,6 +1,6 @@
 import express from 'express';
 
-import sequelize from './database';
+import {sequelize} from './database';
 import router from '../router';
 const server = express();
 const port = process.env.LOCAL_PORT || 3000;

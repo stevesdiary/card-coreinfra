@@ -2,7 +2,7 @@ import { customAlphabet } from 'nanoid';
 
 import { CardRequest, CardRequestStatus } from '../Request/models/card-request.model';
 import { User } from '../../user/models/user.model';
-import { CardProfile } from '../profile/card-profile.model';
+import { CardProfile } from '../card-profile/model/card-profile.model';
 import { CardRequestData } from '../../user/types/type';
 
 
