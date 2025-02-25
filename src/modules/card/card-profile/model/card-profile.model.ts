@@ -4,7 +4,8 @@ import {
   Model, 
   DataType, 
   PrimaryKey,
-  ForeignKey
+  ForeignKey,
+  BelongsTo
 } from 'sequelize-typescript';
 import { User } from '../../../user/models/user.model';
 
@@ -101,5 +102,8 @@ export class CardProfile extends Model {
     defaultValue: 'NGN'
   })
   currency?: string;
+
+  @BelongsTo(() => User)
+  user?: User;
 }
 
