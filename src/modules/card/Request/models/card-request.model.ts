@@ -72,5 +72,5 @@ export class CardRequest extends Model {
   quantity?: number;
 
   @BelongsTo(() => User)
-  user?: User;
+  user!: User;
 }
