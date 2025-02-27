@@ -3,7 +3,6 @@ import { customAlphabet } from 'nanoid';
 import { CardProfile, CardStatus, Currency } from '../card-profile/model/card-profile.model';
 import { CardType } from '../card-profile/model/card-profile.model';
 import { CreationAttributes, Op } from 'sequelize';
-import sequelize from 'sequelize/types/sequelize';
 
 
 export const createCardProfile = async (user_id: string, validatedCardData: CreationAttributes<CardProfile>) => {
@@ -57,10 +56,9 @@ export const createCardProfile = async (user_id: string, validatedCardData: Crea
       };
     }
 
-  
-  
-    const cardProfile = CardProfile.build(cardProfileCreationData);
-    await cardProfile.save();
+    const cardProfile = await CardProfile.create(cardProfileCreationData)
+    // const cardProfile = CardProfile.build(cardProfileCreationData);
+    // await cardProfile.save();
     
     
     const { pin, ...safeCardData } = cardProfile.get({ plain: true });

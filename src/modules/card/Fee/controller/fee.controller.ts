@@ -39,7 +39,7 @@ const feeController = {
 
   updateFee: async (req: Request, res: Response) => {
     try {
-      const { id } = await idSchema.validate(req.params, {abortEarly: false});
+      const { id } = await idSchema.validate(req.query, {abortEarly: false});
       const feeData = await updateFeeSchema.validate(req.body, {abortEarly: false});
 
       const feeUpdate = await updateCardFee(id, feeData);
@@ -102,7 +102,7 @@ const feeController = {
 
   deleteFee: async (req: Request, res: Response) => {
     try {
-      const { id } = await idSchema.validate(req.params, {abortEarly: false});
+      const { id } = await idSchema.validate(req.query, {abortEarly: false});
       const destroyRecord = await deleteCardFee(id);
       return res.status(destroyRecord.statusCode).json(destroyRecord);
       

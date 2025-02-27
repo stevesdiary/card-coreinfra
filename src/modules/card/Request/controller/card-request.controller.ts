@@ -41,7 +41,7 @@ const cardRequestController = {
 
   getCardRequestById: async (req: Request, res: Response): Promise<Response> => {
     try {
-      const { id } = req.params;
+      const { id } = await idSchema.validate(req.query, { abortEarly: false });
 
       const cardRequest = await getCardRequestById(id);
 
@@ -73,7 +73,7 @@ const cardRequestController = {
 
   updateRequestStatus: async (req: Request, res: Response): Promise<Response> => {
     try {
-      const { id } = await idSchema.validate(req.params, { abortEarly: false });
+      const { id } = await idSchema.validate(req.query, { abortEarly: false });
       const validatedData = await cardRequestStatusSchema.validate(req.body, { abortEarly: false });
       
       const cardRequest = await updateCardRequestStatus(id, validatedData.status as string);

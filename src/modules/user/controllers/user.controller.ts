@@ -34,7 +34,7 @@ const userController = {
 
   getOneUser: async (req: ExpressRequest, res: Response): Promise<Response> => {
     try {
-      const { id } = await idSchema.validate(req.params, { abortEarly: false });
+      const { id } = await idSchema.validate(req.query, { abortEarly: false });
       const user = await getOneUser(id);
       return res.status(user.statusCode).send({ status: user.status, message: user.message, data: user.data });
     } catch (error) {
@@ -75,7 +75,7 @@ const userController = {
 
   deleteUser: async (req: ExpressRequest, res: Response): Promise<Response> => {
     try {
-      const { id } = await idSchema.validate(req.params, { abortEarly: false });
+      const { id } = await idSchema.validate(req.query, { abortEarly: false });
       const user = await deleteUser(id);
       return res.status(user.statusCode).send({ status: user.status, message: user.message, data: user.data });
     } catch (error) {
