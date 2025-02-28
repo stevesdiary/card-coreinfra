@@ -76,6 +76,7 @@ export const cardStatusSchema = yup.object().shape({
 
 export const cardRequestStatusSchema = yup.object().shape({
   status: yup.mixed().oneOf(Object.values(CardRequestStatus)).required('Status is required'),
+  card_profile_id: yup.string().uuid().required('card_profile_id is required')
 });
 
 export const paginationSchema = yup.object().shape({
