@@ -1,7 +1,3 @@
-import path from'path';
-import dotenv from 'dotenv';
-import { RedisOptions } from 'ioredis';
-
 require('dotenv').config({ path: '../.env' });
 
 module.exports = {
@@ -18,6 +14,5 @@ module.exports = {
         rejectUnauthorized: false
       }
     }
-  },
-  // ... other environments
+  }
 };
