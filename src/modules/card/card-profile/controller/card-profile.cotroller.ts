@@ -76,7 +76,7 @@ const cardProfileController = {
 
   updateProfile: async (req: Request, res: Response): Promise<Response> => {
     try {
-      const  { id } = await idSchema.validate(req.params, { abortEarly: false });
+      const  { id } = await idSchema.validate(req.query, { abortEarly: false });
 
       const validatedData = await cardProfileUpdateSchema.validate(req.body, { abortEarly: false });
       const userId = req.user?.id;
@@ -112,7 +112,7 @@ const cardProfileController = {
 
   deleteCardProfile: async (req: Request, res: Response): Promise<Response> => {
     try {
-      const { id } = await idSchema.validate(req.params, { abortEarly: false });
+      const { id } = await idSchema.validate(req.query, { abortEarly: false });
       const cardProfile = await deleteCardProfile(id);
 
       return res.status(cardProfile.statusCode).json(cardProfile);

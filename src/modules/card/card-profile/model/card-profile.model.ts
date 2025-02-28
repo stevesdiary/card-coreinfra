@@ -99,7 +99,7 @@ export class CardProfile extends Model {
 
   @Column({
     type: DataType.STRING,
-    defaultValue: 'NGN'
+    defaultValue: Currency.NGN
   })
   currency?: string;
 

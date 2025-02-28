@@ -3,7 +3,6 @@ import { customAlphabet } from 'nanoid';
 import { CardProfile, CardStatus, Currency } from '../card-profile/model/card-profile.model';
 import { CardType } from '../card-profile/model/card-profile.model';
 import { CreationAttributes, Op } from 'sequelize';
-import sequelize from 'sequelize/types/sequelize';
 
 
 export const createCardProfile = async (user_id: string, validatedCardData: CreationAttributes<CardProfile>) => {
@@ -25,7 +24,7 @@ export const createCardProfile = async (user_id: string, validatedCardData: Crea
     expiryDate.setFullYear(expiryDate.getFullYear() + 4); // 4 years from now
 
     const cardProfileCreationData = {
-      user_id: user_id,
+      user_id: user_id || validatedCardData.user_id,
       card_type: validatedCardData.card_type,
       card_holder_name: validatedCardData.card_holder_name,
       card_number: cardNumber,
@@ -37,7 +36,6 @@ export const createCardProfile = async (user_id: string, validatedCardData: Crea
       currency: validatedCardData.currency || 'NGN',
     };
 
-    // Check for existing active card
     const existingCard = await CardProfile.findOne({
       where: {
         user_id: user_id,
@@ -58,12 +56,11 @@ export const createCardProfile = async (user_id: string, validatedCardData: Crea
       };
     }
 
-  
-  
-    const cardProfile = CardProfile.build(cardProfileCreationData);
-    await cardProfile.save();
+    const cardProfile = await CardProfile.create(cardProfileCreationData)
+    // const cardProfile = CardProfile.build(cardProfileCreationData);
+    // await cardProfile.save();
     
-    // Exclude sensitive fields from response
+    
     const { pin, ...safeCardData } = cardProfile.get({ plain: true });
 
     return {
@@ -90,7 +87,7 @@ export const getCardProfileById = async (id: string) => {
         exclude: [ 'pin' ]
       }
     } );
-    // console.log(cardProfile)
+
     if (!cardProfile) {
       return {
         statusCode: 404,
