@@ -7,7 +7,8 @@ export enum UserRole {
 }
 @Table({
   tableName: 'users',
-  timestamps: true
+  timestamps: true,
+  underscored: true
 })
 export class User extends Model {
   @IsUUID(4)
@@ -58,9 +59,6 @@ export class User extends Model {
   @Default(false)
   @Column(DataType.BOOLEAN)
   verified!: boolean;
-
-  // @HasOne(() => CardProfile)
-  // card_profile!: CardProfile;
 
   @HasMany(() => CardProfile)
   card_profiles?: CardProfile[];
