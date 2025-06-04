@@ -74,9 +74,10 @@ const cardRequestController = {
   updateRequestStatus: async (req: Request, res: Response): Promise<Response> => {
     try {
       const { id } = await idSchema.validate(req.query, { abortEarly: false });
+      // card profile ID is required
       const validatedData = await cardRequestStatusSchema.validate(req.body, { abortEarly: false });
       
-      const cardRequest = await updateCardRequestStatus(id, validatedData.status as string);
+      const cardRequest = await updateCardRequestStatus(id, validatedData);
 
       return res.status(cardRequest.statusCode).json(cardRequest);
     } catch (error) {
