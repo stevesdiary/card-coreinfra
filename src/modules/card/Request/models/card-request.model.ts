@@ -7,7 +7,8 @@ import {
   BelongsTo 
 } from 'sequelize-typescript';
 import { User } from '../../../user/models/user.model';
-import { CardType } from '../../card-profile/model/card-profile.model';
+import { CardProfile, CardType } from '../../card-profile/model/card-profile.model';
+import { Col } from 'sequelize/types/utils';
 
 export const CardRequestStatus = {
   PENDING: 'PENDING',
@@ -46,6 +47,13 @@ export class CardRequest extends Model {
     allowNull: false
   })
   status?: string;
+
+  @ForeignKey(() => CardProfile)
+  @Column({
+    type: DataType.UUID,
+    allowNull: false
+  })
+  card_profile_id?: string;
 
   @Column({
     type: DataType.UUID,

@@ -8,7 +8,7 @@ let redisClient: Redis | null = null;
 async function initializeRedisConnection(): Promise<Redis> {
   if (!redisClient) {
     redisClient = new Redis({
-      host: process.env.REDIS_HOST || 'localt',
+      host: process.env.REDIS_HOST || 'localhost',
       port: Number(process.env.REDIS_PORT) || 63790,
       password: process.env.REDIS_PASSWORD || 'password',
       db: Number(process.env.REDIS_DATABASE_NAME) || 0,

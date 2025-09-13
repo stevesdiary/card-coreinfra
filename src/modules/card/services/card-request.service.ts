@@ -4,6 +4,7 @@ import { CardRequest, CardRequestStatus } from '../Request/models/card-request.m
 import { User } from '../../user/models/user.model';
 import { CardProfile } from '../card-profile/model/card-profile.model';
 import { CardRequestData } from '../../user/types/type';
+import { UUID } from 'sequelize';
 
 
 
@@ -127,7 +128,7 @@ export const updateCardRequest = async (requestId: string, data: Partial<CardReq
   }
 }
 
-export const updateCardRequestStatus = async (requestId: string, status: string) => {
+export const updateCardRequestStatus = async (requestId: string, data: any) => {
   try {
     const cardRequest = await CardRequest.findByPk(requestId);
     if (!cardRequest) {
@@ -138,9 +139,10 @@ export const updateCardRequestStatus = async (requestId: string, status: string)
         data: null
       };
     }
-    // const data = { status: CardRequestStatus };
+    data = { status: CardRequestStatus, card_profile_id: UUID };
     const updatedCardRequest = await cardRequest.update({
-      status: status,
+      status: data.status,
+      card_profile_id: data.card_profile_id,
       where: { id: requestId }
     });
 
